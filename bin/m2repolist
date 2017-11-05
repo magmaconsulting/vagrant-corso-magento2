@@ -1,0 +1,106 @@
+#!/usr/bin/env php
+<?php
+
+
+/**
+ * Return the path of the auth.json file.
+ */
+function findAuthJson() {
+
+    // Windows sets HOMEDRIVE and HOMEPATH, but cygwin sets HOME.
+    if (!isset($_SERVER["HOME"]) && isset($_SERVER["HOMEDRIVE"])) {
+        $home = $_SERVER["HOMEDRIVE"] . $_SERVER["HOMEPATH"];
+    } else {
+        $home = getenv("HOME");
+    }
+
+    $paths = [
+        $home . '/.composer/auth.json',
+        $home . '/.config/composer/auth.json',
+        'auth.json',
+        'app/etc/composer/auth.json'
+    ];
+
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
+            return $path;
+        }
+    }
+
+    echo "Unable to find 'auth.json' file holding composer repo keys\n";
+    exit(1);
+}
+
+
+/**
+ * Returns username and password from ~/.composer/auth.json.
+ * Returned in assciation with keys "username" and "password".
+ */
+function getAuthUsernamePassword() {
+    $authName = findAuthJson();
+    $auth = json_decode(file_get_contents($authName), true);
+    $up = $auth["http-basic"]["repo.magento.com"];
+    return $up;
+}
+
+
+/**
+ * Fetch packages.json file.
+ */
+function getPackagesJson() {
+
+    $userpass = getAuthUsernamePassword();
+
+    $process = curl_init();
+    curl_setopt($process, CURLOPT_URL, 'https://repo.magento.com/packages.json');
+    curl_setopt($process, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($process, CURLOPT_USERPWD, $userpass['username'] . ":" . $userpass['password']);
+    curl_setopt($process, CURLOPT_TIMEOUT, 30);
+    curl_setopt($process, CURLOPT_RETURNTRANSFER, TRUE);
+    $return = curl_exec($process);
+    curl_close($process);
+
+    return json_decode($return, true);
+}
+
+
+
+$packagesJson = getPackagesJson();
+
+foreach ($packagesJson['packages'] as $packageName => $versions) {
+    $keep = false;
+    foreach ($versions as $version => $package) {
+        $description = $package['description'];
+        $type = $package['type'];
+        if ($type !== 'magento2-module'
+        && $type !== 'magento2-library'
+        && $type !== 'magento2-component'
+        && $type !== 'library') {
+            $keep = true;
+        } else if (substr($packageName, 0, 8) !== "magento/") {
+            $keep = true;
+        }
+    }
+
+    if ($keep) {
+        $versionNumbers = implode(' ', array_keys($versions));
+        echo "$packageName [$type]\n";
+        foreach ($versions as $version => $package) {
+            $dep = '';
+            if (isset($package['require'])) {
+                foreach ($package['require'] as $dp => $dv) {
+                    if ($dp !== 'php' && $dp !== 'composer/composer') {
+                        $dep .= " $dp:$dv";
+                    }
+                }
+            }
+            $line = "    $version$dep";
+            if (strlen($line) > 78) {
+                $line = substr($line, 0, 75) . '...';
+            }
+            echo "$line\n";
+        }
+        $d = wordwrap($description, 72, "\n    ");
+        echo "    $d\n\n";
+    }
+}

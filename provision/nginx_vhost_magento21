@@ -1,0 +1,6 @@
+server {
+        listen 80;
+        server_name magento21.dev;
+        set $MAGE_ROOT /vagrant/magento21;
+        include /vagrant/magento21/nginx.conf;
+}
