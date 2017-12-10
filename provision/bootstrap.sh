@@ -27,10 +27,11 @@ echo "Installo altri pacchetti..."
 sudo apt-get install -y wget composer > /dev/null 2>&1
 
 echo "Preparo web tools"
-mkdir -p /vagrant/default
-cd /vagrant/default
-wget http://www.adminer.org/latest.php -O adminer.php > /dev/null 2>&1
-echo "<?php phpinfo(); " > info.php
+#mkdir -p /vagrant/default
+#cd /vagrant/default
+#chown vagrant default
+#wget http://www.adminer.org/latest.php -O adminer.php > /dev/null 2>&1
+#echo "<?php phpinfo(); " > info.php
 
 echo "Aggiunto istruzioni in bash profile"
 echo "cd /vagrant" >> /home/vagrant/.profile

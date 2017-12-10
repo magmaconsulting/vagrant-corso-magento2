@@ -1,0 +1,11 @@
+/*
+!composer.json
+!composer.lock
+!deploy.php
+!.gitignore
+!/app
+/app/*
+!/app/code/
+!/app/design/
+!README.md
+.DS_Store

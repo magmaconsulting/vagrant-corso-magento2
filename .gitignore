@@ -1,4 +1,6 @@
 .DS_Store
 .vagrant
 .cache
+.idea
 magento*
+backup*

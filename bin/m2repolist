@@ -15,10 +15,10 @@ function findAuthJson() {
     }
 
     $paths = [
-        $home . '/.composer/auth.json',
-        $home . '/.config/composer/auth.json',
-        'auth.json',
-        'app/etc/composer/auth.json'
+      'auth.json',
+      'app/etc/composer/auth.json',
+      $home . '/.composer/auth.json',
+      $home . '/.config/composer/auth.json'
     ];
 
     foreach ($paths as $path) {

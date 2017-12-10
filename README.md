@@ -35,4 +35,4 @@ Successive sessioni di lavoro:
 Gli utenti con macchine windows potrebbero necessitare di operazioni leggermente diverse per:
 
 * SSH: potrebbe essere necessario accedere alla macchina con un client ssh (es. putty);
-* Sincronizzazione delle cartelle: potrebbe essere neecessario una maggiore configurazione per gestire la sincronizzazione dei link simbolici;
+* Sincronizzazione delle cartelle: potrebbe essere necessario una maggiore configurazione per gestire la sincronizzazione dei link simbolici;
